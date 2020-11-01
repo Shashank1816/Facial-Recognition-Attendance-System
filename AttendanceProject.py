@@ -3,6 +3,7 @@ import numpy as np
 import face_recognition
 #we create a list that will create a list of all the images in the folder ImagesBasic and create it's encodings
 import os
+from datetime import datetime
 
 path = 'ImagesAttendance'
 images = []
@@ -24,6 +25,24 @@ def findEncodings(images):
         encode =face_recognition.face_encodings(img)[0]
         encodeList.append(encode)
     return encodeList
+#We'll create the function to mark our attendance
+def markAttendance(name):
+    with open('Attendance.csv','r+') as f: #to open the file and we want to read and write at the same time
+        #now we'll read in all the lines currently in our data, so that somebody arrives twice we don't want to repeat the entry
+        myDataList=f.readlines()
+        nameList=[]#we want to put all the names already present in this list
+        for line in myDataList:
+            entry = line.split(',')
+            nameList.append(entry[0])
+        #once we have this list complete, we'll check that the current name is already present in the list or not
+        if name not in nameList:
+            now = datetime.now()
+            dtString = now.strftime('%H:%M:%S') #format for time
+            f.writelines(f'\n{name},{dtString}')
+
+
+        print(myDataList)
+
 
 encodeListKnown = findEncodings(images)
 print(len(encodeListKnown))
@@ -47,8 +66,18 @@ while True:
         matches=face_recognition.compare_faces(encodeListKnown,encodeFace)
         #then we'll find the distance
         faceDis=face_recognition.face_distance(encodeListKnown,encodeFace)#The lowest distance will be our best match
-        print(faceDis)
+        #print(faceDis)
         matchIndex=np.argmin(faceDis) # to get the image with the lowest distance
+
+        if matches[matchIndex]:
+            name = classNames[matchIndex].upper() #to convert uppercase
+            #print(name)
+            #we'll create a rectangle around the face
+            y1,x2,y2,x1=faceLoc
+            y1, x2, y2, x1=y1*4,x2*4,y2*4,x1*4
+            cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0),2)
+            cv2.rectangle(img,(x1,y2-35),(x2,y2),(0,255,0),cv2.FILLED)
+            cv2.putText(img,name,(x1+6,y2-6),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
 
 
     #We can create a bounding box around the face and then we'll print the name
