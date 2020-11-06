@@ -6,4 +6,3 @@
 <hr>
 <img src=https://github.com/Shashank1816/Facial-Recognition-Attendance-System/blob/main/Project_images/2020-11-01%20(16).png>
 <hr>
-<img src=https://github.com/Shashank1816/Facial-Recognition-Attendance-System/blob/main/Project_images/2020-11-01%20(15).png>
